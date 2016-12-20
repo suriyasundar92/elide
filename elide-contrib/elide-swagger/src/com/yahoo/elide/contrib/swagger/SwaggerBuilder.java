@@ -1,19 +1,116 @@
 package com.yahoo.elide.contrib.swagger;
 
 import com.yahoo.elide.core.EntityDictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class SwaggerBuilder {
+    EntityDictionary dictionary;
+    Set<Class<?>> rootClasses;
+
+    @AllArgsConstructor
+    public class PathMetaData {
+        Stack<PathMetaData> lineage;
+
+        @Getter
+        String name;
+
+        @Getter
+        Class<?> type;
+
+        public PathMetaData(Class<?> type) {
+            this.type = type;
+            lineage = new Stack<>();
+            name = dictionary.getJsonAliasFor(type);
+        }
+
+        public String getCollectionUrl() {
+            if (lineage.isEmpty()) {
+                return "/" + name;
+            } else {
+                return lineage.peek().getInstanceUrl() + "/" + name;
+            }
+        }
+
+        public String getInstanceUrl() {
+            String typeName = dictionary.getJsonAliasFor(type);
+            return getCollectionUrl() + "/{" + typeName + "Id}";
+        }
+
+        public Stack<PathMetaData> getFullLineage() {
+            Stack<PathMetaData> fullLineage = new Stack<>();
+
+            //TODO - This maybe in the wrong order.
+            fullLineage.addAll(lineage);
+            fullLineage.add(this);
+            return fullLineage;
+        }
+
+        public boolean lineageContainsType(Class<?> type) {
+            if (this.type.equals(type)) {
+                return true;
+            }
+
+            if (lineage.isEmpty()) {
+                return false;
+            }
+
+            return lineage.peek().lineageContainsType(type);
+        }
+    }
+
     public SwaggerBuilder(EntityDictionary dictionary) {
+        this.dictionary = dictionary;
         Set<Class<?>> allClasses = dictionary.getBindings();
-        Set<Class<?>> rootClasses =  allClasses.stream()
+        rootClasses =  allClasses.stream()
                 .filter(dictionary::isRoot)
                 .collect(Collectors.toSet());
 
+        Set<PathMetaData> paths =  rootClasses.stream()
+                .map(this::find)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
 
     }
+
+    public Set<PathMetaData> find(Class<?> rootClass) {
+        Queue<PathMetaData> toVisit = new ArrayDeque<>();
+        Set<PathMetaData> paths = new HashSet<>();
+
+        toVisit.add(new PathMetaData(rootClass));
+
+        while (! toVisit.isEmpty()) {
+            PathMetaData next = toVisit.remove();
+
+            List<String> relationshipNames = dictionary.getRelationships(next.getType());
+
+            for (String relationshipName : relationshipNames) {
+                Class<?> relationshipClass = dictionary.getParameterizedType(next.getType(), relationshipName);
+
+                if (next.lineageContainsType(relationshipClass) || rootClasses.contains(relationshipClass)) {
+                    continue;
+                }
+
+                toVisit.add(new PathMetaData(next.getFullLineage(), relationshipName, relationshipClass));
+
+            }
+
+            paths.add(next);
+        }
+        return paths;
+    }
+
+
+
 
     // public SwaggerBuilder(EntityDictionary entityDictionary)
     // {
