@@ -1,10 +1,25 @@
 package test;
 
-import junit.framework.*;
 
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.*;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Contact;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Header;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Items;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.MimeType;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Parameter;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.SecurityRequirement;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.SwaggerValidationException;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-public class SwaggerTest extends TestCase {
+public class SwaggerTest {
 
     private Swagger getFunctionalSwagger()
     {
@@ -14,19 +29,20 @@ public class SwaggerTest extends TestCase {
         return retval;
     }
 
+    @Test
     public void testRequired() throws SwaggerValidationException
     {
         Swagger s = new Swagger();
         try {
             s.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
         s.info = new Info();
         try {
             s.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {
@@ -38,12 +54,13 @@ public class SwaggerTest extends TestCase {
      * The point of this method is to make sure
      * that the checkAllRequired() method goes all the way down the stack
      */
+    @Test
     public void testCheckAllRequired() throws SwaggerValidationException
     {
         Swagger s = new Swagger();
         try {
             Swagger.checkAllRequired(s);
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {
@@ -52,7 +69,7 @@ public class SwaggerTest extends TestCase {
         s.paths = new Paths();
         try {
             Swagger.checkAllRequired(s);
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {
@@ -66,7 +83,7 @@ public class SwaggerTest extends TestCase {
         s.info.contact.url = "the internet";
         try {
             Swagger.checkAllRequired(s);
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {
@@ -76,7 +93,7 @@ public class SwaggerTest extends TestCase {
         s.info.contact.email = "1600 Pennsylvania Avenue";
         try {
             Swagger.checkAllRequired(s);
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {
@@ -86,16 +103,19 @@ public class SwaggerTest extends TestCase {
 
 
     }
+
+    @Test
     public void testPathsRejectsBadPath() {
         Paths paths = new Paths();
         try {
             paths.put("test", new Path());
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (IllegalArgumentException e)
         {}
     }
 
+    @Test
     public void testPathValidator() throws SwaggerValidationException
     {
         Path dummyPath = new Path();
@@ -103,7 +123,7 @@ public class SwaggerTest extends TestCase {
         dummyPath.ref = "apples";
         try {
             dummyPath.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {
@@ -127,32 +147,33 @@ public class SwaggerTest extends TestCase {
         dummyPath.parameters[1].in = Enums.Location.BODY;
         try {
             dummyPath.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
     }
 
+    @Test
     public void testParameterValidator() throws SwaggerValidationException
     {
         Parameter p = new Parameter();
         try {
             p.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
         p.name = "This is a test name";
         try {
             p.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
         p.in = Enums.Location.BODY;
         try {
             p.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -162,6 +183,7 @@ public class SwaggerTest extends TestCase {
      * I'm going to test all the validation methods on the classes where they're 
      * overridden.
      */
+    @Test
     public void testContactsValidation() throws SwaggerValidationException
     {
         Contact contact = new Contact();
@@ -169,7 +191,7 @@ public class SwaggerTest extends TestCase {
         contact.url = "Hey boys! How's the water?";
         try {
             contact.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -178,7 +200,7 @@ public class SwaggerTest extends TestCase {
         contact.email = "http://i.imgur.com/dYz2tCE.gifv";
         try {
             contact.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -186,12 +208,13 @@ public class SwaggerTest extends TestCase {
         contact.checkRequired();
     }
 
-    public void testHeaderValidation() throws SwaggerValidationException 
+    @Test
+    public void testHeaderValidation() throws SwaggerValidationException
     {
         Header header = new Header();
         try {
             header.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -200,7 +223,7 @@ public class SwaggerTest extends TestCase {
         header.type = Enums.Type.ARRAY;
         try {
             header.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -210,18 +233,19 @@ public class SwaggerTest extends TestCase {
         // again later, but this is just to make extra sure. 
         try {
             Swagger.checkAllRequired(header);
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
     }
 
+    @Test
     public void testItemsValidation() throws SwaggerValidationException
     {
         Items items = new Items();
         try {
             items.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -231,7 +255,7 @@ public class SwaggerTest extends TestCase {
         items.type = Enums.Type.ARRAY;
         try {
             items.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -240,12 +264,13 @@ public class SwaggerTest extends TestCase {
 
         try {
             Swagger.checkAllRequired(items);
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
     }
 
+    @Test
     public void testOperationRejectsDuplicateId() throws SwaggerValidationException
     {
         Operation operation = new Operation();
@@ -255,7 +280,7 @@ public class SwaggerTest extends TestCase {
         Operation otherOther = new Operation();
         try {
             otherOther.setOperationId("Cache invalidation");
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (IllegalArgumentException e)
         {}
@@ -263,6 +288,7 @@ public class SwaggerTest extends TestCase {
         otherOther.setOperationId("Cache invalidation");
     }
 
+    @Test
     public void testOperationValidation() throws SwaggerValidationException
     {
         Operation operation = new Operation();
@@ -279,7 +305,7 @@ public class SwaggerTest extends TestCase {
         operation.parameters = params;
         try {
             operation.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -288,7 +314,7 @@ public class SwaggerTest extends TestCase {
         params[1].name = "Other test";
         try {
             operation.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -297,7 +323,7 @@ public class SwaggerTest extends TestCase {
         params[0].type = Enums.Type.FILE;
         try {
             operation.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -305,13 +331,14 @@ public class SwaggerTest extends TestCase {
         operation.checkRequired();
     }
 
-    public void testSchemaValidation() throws SwaggerValidationException 
+    @Test
+    public void testSchemaValidation() throws SwaggerValidationException
     {
         Schema schema = new Schema();
         schema.ref = "Is this water?";
         try {
             schema.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -319,6 +346,7 @@ public class SwaggerTest extends TestCase {
         schema.checkRequired();
     }
 
+    @Test
     public void testSecurityRequirementValidation() throws SwaggerValidationException
     {
         SecurityRequirement secReq = new SecurityRequirement();
@@ -327,7 +355,7 @@ public class SwaggerTest extends TestCase {
         secReq.put("A secret handshake", new String[] {"butterfly", "spin around", "sign the alphabet"});
         try {
             secReq.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -336,7 +364,7 @@ public class SwaggerTest extends TestCase {
         secReq.put("oauth2", null);
         try {
             secReq.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -345,7 +373,7 @@ public class SwaggerTest extends TestCase {
         secReq.put("oauth2", new String[0]);
         try {
             secReq.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}
@@ -355,7 +383,7 @@ public class SwaggerTest extends TestCase {
         secReq.put("oauth2", new String[] {"An understanding of web security"});
         try {
             secReq.checkRequired();
-            fail("Something isn't working right; there should be an exception here");
+            Assert.fail("Something isn't working right; there should be an exception here");
         }
         catch (SwaggerValidationException e)
         {}

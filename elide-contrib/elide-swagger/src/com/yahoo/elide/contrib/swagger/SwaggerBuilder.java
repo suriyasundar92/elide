@@ -1,8 +1,20 @@
 package com.yahoo.elide.contrib.swagger;
 
-// import com.yahoo.elide.core.EntityDictionary;
+import com.yahoo.elide.core.EntityDictionary;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SwaggerBuilder {
+    public SwaggerBuilder(EntityDictionary dictionary) {
+        Set<Class<?>> allClasses = dictionary.getBindings();
+        Set<Class<?>> rootClasses =  allClasses.stream()
+                .filter(dictionary::isRoot)
+                .collect(Collectors.toSet());
+
+
+    }
+
     // public SwaggerBuilder(EntityDictionary entityDictionary)
     // {
     //     Swagger retval = new Swagger();
