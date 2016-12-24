@@ -1,5 +1,8 @@
 package com.yahoo.elide.contrib.swagger;
 
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
 import com.yahoo.elide.core.EntityDictionary;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class SwaggerBuilder {
     EntityDictionary dictionary;
     Set<Class<?>> rootClasses;
+    Swagger swagger;
 
     @AllArgsConstructor
     public class PathMetaData {
@@ -75,11 +79,24 @@ public class SwaggerBuilder {
                 .filter(dictionary::isRoot)
                 .collect(Collectors.toSet());
 
-        Set<PathMetaData> paths =  rootClasses.stream()
+        Set<PathMetaData> pathData =  rootClasses.stream()
                 .map(this::find)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
+        swagger = new Swagger();
+        Paths paths = new Paths();
+
+        for (PathMetaData pathDatum : pathData) {
+            paths.put(pathDatum.getCollectionUrl(), new Path());
+            paths.put(pathDatum.getInstanceUrl(), new Path());
+        }
+
+        swagger.paths = paths;
+    }
+
+    public Swagger build() {
+        return swagger;
     }
 
     public Set<PathMetaData> find(Class<?> rootClass) {
@@ -96,11 +113,13 @@ public class SwaggerBuilder {
             for (String relationshipName : relationshipNames) {
                 Class<?> relationshipClass = dictionary.getParameterizedType(next.getType(), relationshipName);
 
-                if (next.lineageContainsType(relationshipClass) || rootClasses.contains(relationshipClass)) {
+                if (next.lineageContainsType(relationshipClass)) {
                     continue;
                 }
 
-                toVisit.add(new PathMetaData(next.getFullLineage(), relationshipName, relationshipClass));
+                if (!rootClasses.contains(relationshipClass)) {
+                    toVisit.add(new PathMetaData(next.getFullLineage(), relationshipName, relationshipClass));
+                }
 
             }
 
@@ -108,9 +127,6 @@ public class SwaggerBuilder {
         }
         return paths;
     }
-
-
-
 
     // public SwaggerBuilder(EntityDictionary entityDictionary)
     // {
