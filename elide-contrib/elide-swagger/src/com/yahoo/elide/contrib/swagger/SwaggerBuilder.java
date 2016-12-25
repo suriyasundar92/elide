@@ -1,7 +1,11 @@
 package com.yahoo.elide.contrib.swagger;
 
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Response;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
 import com.yahoo.elide.core.EntityDictionary;
 import lombok.AllArgsConstructor;
@@ -50,6 +54,41 @@ public class SwaggerBuilder {
             return getCollectionUrl() + "/{" + typeName + "Id}";
         }
 
+        public Path getCollectionPath() {
+            String typeName = dictionary.getJsonAliasFor(type);
+            Path path = new Path();
+            path.get = new Operation();
+
+            if (lineage.isEmpty()) {
+                path.get.description = "Returns the collection of type " + typeName;
+            } else {
+                path.get.description = "Returns the relationship " + name;
+            }
+
+            path.get.responses = new Responses();
+
+            Response okResponse = new Response();
+            okResponse.description = "Successful response";
+            path.get.responses.put(200, okResponse);
+
+            return path;
+        }
+
+        public Path getInstancePath() {
+            String typeName = dictionary.getJsonAliasFor(type);
+            Path path = new Path();
+            path.get = new Operation();
+            path.get.description = "Returns an instance of type " + typeName;
+
+            path.get.responses = new Responses();
+
+            Response okResponse = new Response();
+            okResponse.description = "Successful response";
+            path.get.responses.put(200, okResponse);
+
+            return path;
+        }
+
         public Stack<PathMetaData> getFullLineage() {
             Stack<PathMetaData> fullLineage = new Stack<>();
 
@@ -72,7 +111,7 @@ public class SwaggerBuilder {
         }
     }
 
-    public SwaggerBuilder(EntityDictionary dictionary) {
+    public SwaggerBuilder(EntityDictionary dictionary, Info info) {
         this.dictionary = dictionary;
         Set<Class<?>> allClasses = dictionary.getBindings();
         rootClasses =  allClasses.stream()
@@ -88,10 +127,11 @@ public class SwaggerBuilder {
         Paths paths = new Paths();
 
         for (PathMetaData pathDatum : pathData) {
-            paths.put(pathDatum.getCollectionUrl(), new Path());
-            paths.put(pathDatum.getInstanceUrl(), new Path());
+            paths.put(pathDatum.getCollectionUrl(), pathDatum.getCollectionPath());
+            paths.put(pathDatum.getInstanceUrl(), pathDatum.getInstancePath());
         }
 
+        swagger.info = info;
         swagger.paths = paths;
     }
 

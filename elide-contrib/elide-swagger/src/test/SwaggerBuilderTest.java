@@ -7,6 +7,7 @@ package test;
 
 import com.google.common.collect.Maps;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
 import com.yahoo.elide.contrib.swagger.SwaggerBuilder;
 import com.yahoo.elide.core.EntityDictionary;
@@ -73,7 +74,11 @@ public class SwaggerBuilderTest {
         dictionary.bindEntity(Author.class);
         dictionary.bindEntity(Publisher.class);
 
-        SwaggerBuilder builder = new SwaggerBuilder(dictionary);
+        Info info = new Info();
+        info.title = "Test Service";
+        info.version = "1.0";
+
+        SwaggerBuilder builder = new SwaggerBuilder(dictionary, info);
         Swagger swagger = builder.build();
 
         Assert.assertTrue(swagger.paths.containsKey("/publisher"));
