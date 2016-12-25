@@ -7,6 +7,7 @@ import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Response;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Tag;
 import com.yahoo.elide.core.EntityDictionary;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,6 +55,14 @@ public class SwaggerBuilder {
             return getCollectionUrl() + "/{" + typeName + "Id}";
         }
 
+        private String getTag() {
+            if (lineage.isEmpty()) {
+                return name;
+            } else {
+                return lineage.get(0).getName();
+            }
+        }
+
         public Path getCollectionPath() {
             String typeName = dictionary.getJsonAliasFor(type);
             Path path = new Path();
@@ -66,6 +75,8 @@ public class SwaggerBuilder {
             }
 
             path.get.responses = new Responses();
+
+            path.get.tags = new String[] {getTag()};
 
             Response okResponse = new Response();
             okResponse.description = "Successful response";
@@ -81,6 +92,8 @@ public class SwaggerBuilder {
             path.get.description = "Returns an instance of type " + typeName;
 
             path.get.responses = new Responses();
+
+            path.get.tags = new String[] {getTag()};
 
             Response okResponse = new Response();
             okResponse.description = "Successful response";
@@ -133,6 +146,13 @@ public class SwaggerBuilder {
 
         swagger.info = info;
         swagger.paths = paths;
+
+        List<Tag> tags = rootClasses.stream()
+                .map((clazz) -> dictionary.getJsonAliasFor(clazz))
+                .map((name) -> new Tag(name))
+                .collect(Collectors.toList());
+
+        swagger.tags = tags.toArray(new Tag[0]);
     }
 
     public Swagger build() {
