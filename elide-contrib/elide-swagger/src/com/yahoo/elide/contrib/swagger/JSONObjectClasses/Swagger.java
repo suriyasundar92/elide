@@ -1,9 +1,10 @@
 package com.yahoo.elide.contrib.swagger.JSONObjectClasses;
 
-import java.util.HashSet;
-import java.util.Set;
-
 // https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Swagger extends SwaggerComponent {
     protected static Swagger main;
@@ -46,5 +47,16 @@ public class Swagger extends SwaggerComponent {
             throw new SwaggerValidationException("The first letter of the basePath must be /");
         if(tags != null && Util.hasDuplicates(tags))
             throw new SwaggerValidationException("Tags can't have duplicates in it");
+    }
+
+    @Override
+    public String toString() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Unable to serialize swagger document");
+        }
     }
 }
