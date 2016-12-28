@@ -7,11 +7,11 @@ package test;
 
 import com.google.common.collect.Maps;
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
-import com.yahoo.elide.contrib.swagger.SwaggerBuilder;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
+import com.yahoo.elide.contrib.swagger.TypeCoercion;
 import com.yahoo.elide.core.EntityDictionary;
-import junit.framework.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.persistence.Entity;
@@ -19,7 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.Set;
 
-public class SwaggerBuilderTest {
+public class TypeCoercionTest {
     @Entity
     @Include
     public class Author {
@@ -61,34 +61,49 @@ public class SwaggerBuilderTest {
         public Publisher getPublisher() {
             return null;
         }
+
+        public String title;
     }
 
-
     @Test
-    public void testPathGeneration() throws Exception {
+    public void testEntityCoercion() {
         EntityDictionary dictionary = new EntityDictionary(Maps.newHashMap());
 
         dictionary.bindEntity(Book.class);
         dictionary.bindEntity(Author.class);
         dictionary.bindEntity(Publisher.class);
 
-        Info info = new Info();
-        info.title = "Test Service";
-        info.version = "1.0";
+        TypeCoercion coercion = new TypeCoercion(dictionary);
 
-        SwaggerBuilder builder = new SwaggerBuilder(dictionary, info);
-        Swagger swagger = builder.build();
+        Schema schema = coercion.coerce(Book.class);
 
-        Assert.assertTrue(swagger.paths.containsKey("/publisher"));
-        Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}"));
-        Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}/exclusiveAuthors"));
-        Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}/exclusiveAuthors/{authorId}"));
-        Assert.assertTrue(swagger.paths.containsKey("/book"));
-        Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}"));
-        Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}/authors"));
-        Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}/authors/{authorId}"));
-        Assert.assertEquals(swagger.paths.size(), 8);
+        Schema attributes = schema.properties.get("attributes");
+        Assert.assertEquals(attributes.properties.size(), 1);
 
-        System.out.println(swagger.toString());
+        Schema relationships = schema.properties.get("relationships");
+        Assert.assertEquals(relationships.properties.size(), 2);
+
+    }
+
+    @Test
+    public void testPrimitiveCoercion() {
+        EntityDictionary dictionary = new EntityDictionary(Maps.newHashMap());
+        TypeCoercion coercion = new TypeCoercion(dictionary);
+
+        Schema schema = coercion.coerce(String.class);
+        Assert.assertEquals(schema.type, Enums.Type.STRING);
+    }
+
+    @Test
+    public void testArrayCoercion() {
+        EntityDictionary dictionary = new EntityDictionary(Maps.newHashMap());
+        TypeCoercion coercion = new TypeCoercion(dictionary);
+
+        String[] strings = new String[1];
+
+        Schema schema = coercion.coerce(strings.getClass());
+
+        Assert.assertEquals(schema.type, Enums.Type.ARRAY);
+        Assert.assertEquals(schema.items.type, Enums.Type.STRING);
     }
 }

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2016, Yahoo Inc.
+ * Licensed under the Apache License, Version 2.0
+ * See LICENSE file in project root for terms.
+ */
 package com.yahoo.elide.contrib.swagger.JSONObjectClasses;
 
 public class Schema extends SwaggerComponent {
@@ -27,6 +32,8 @@ public class Schema extends SwaggerComponent {
     public Object[] enumeration;
     public int multipleOf;
     public Enums.Type type;
+    public Properties properties;
+    public Schema items;
     public Schema()
     {
         required = REQUIRED;

@@ -59,7 +59,13 @@ public class Enums {
         ARRAY, 
 
         @SerializedName("file")
-        FILE, 
+        FILE,
+
+        @SerializedName("null")
+        NULL,
+
+        @SerializedName("object")
+        OBJECT
     };
 
     public enum Scheme {
