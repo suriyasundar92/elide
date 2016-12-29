@@ -2,12 +2,15 @@ package com.yahoo.elide.contrib.swagger;
 
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Datum;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Definitions;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Parameter;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Response;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Tag;
 import com.yahoo.elide.core.EntityDictionary;
@@ -65,6 +68,20 @@ public class SwaggerBuilder {
             }
         }
 
+        private Parameter getPathParameter() {
+            String typeName = dictionary.getJsonAliasFor(type);
+
+            Parameter param = new Parameter();
+            param.in =  Enums.Location.PATH;
+            param.schema = new Schema();
+            param.schema.type = Enums.Type.STRING;
+            param.required = true;
+            param.name = typeName + "Id";
+            param.description = typeName + " ID";
+
+            return param;
+        }
+
         public Path getCollectionPath() {
             String typeName = dictionary.getJsonAliasFor(type);
             Path path = new Path();
@@ -101,6 +118,11 @@ public class SwaggerBuilder {
             okResponse.description = "Successful response";
             okResponse.schema = new Datum(typeName);
             path.get.responses.put(200, okResponse);
+
+            path.parameters = getFullLineage().stream()
+                    .map((item) -> item.getPathParameter())
+                    .collect(Collectors.toList())
+                    .toArray(new Parameter[0]);
 
             return path;
         }

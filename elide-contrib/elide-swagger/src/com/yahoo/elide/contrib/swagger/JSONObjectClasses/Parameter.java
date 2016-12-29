@@ -10,30 +10,30 @@ public class Parameter extends SwaggerComponent {
     public String name;
     public Enums.Location in;
     public String description;
-    public boolean required;
+    public Boolean required;
     public Schema schema;
     public Enums.Type type;
     public Enums.DataType format;
-    public boolean allowEmptyValue = false;
+    public Boolean allowEmptyValue = false;
     public Items items;
     public Enums.Format collectionFormat = Enums.Format.CSV;
     // It says this could be any type, but I'm just going to say it's a 
     // String since a human will be reading it and a string can describe anything.
     public String defaultValue;
-    public int maximum;
-    public boolean exclusiveMaximum;
-    public int minimum;
-    public boolean exclusiveMinimum;
-    public int maxLength;
-    public int minLength;
+    public Integer maximum;
+    public Boolean exclusiveMaximum;
+    public Integer minimum;
+    public Boolean exclusiveMinimum;
+    public Integer maxLength;
+    public Integer minLength;
     public String pattern;
-    public int maxItems;
-    public int minItems;
-    public boolean uniqueItems;
+    public Integer maxItems;
+    public Integer minItems;
+    public Boolean uniqueItems;
     // I'm not 100% sure if this is ever required. Hmmm...
     public Object[] enumeration;
     // I haven't the slightest idea of the significance of this.
-    public int multipleOf;
+    public Integer multipleOf;
 
     @Override
     public void checkRequired() throws SwaggerValidationException
