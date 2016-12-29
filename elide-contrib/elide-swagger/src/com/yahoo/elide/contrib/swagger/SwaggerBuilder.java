@@ -1,5 +1,6 @@
 package com.yahoo.elide.contrib.swagger;
 
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Data;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Datum;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Definitions;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
@@ -82,10 +83,31 @@ public class SwaggerBuilder {
             return param;
         }
 
+        private Parameter getBodyParameter() {
+            String typeName = dictionary.getJsonAliasFor(type);
+
+            Parameter param = new Parameter();
+            param.in =  Enums.Location.BODY;
+            param.schema = new Datum(typeName);
+            param.required = true;
+            param.name = typeName;
+
+            return param;
+        }
+
         public Path getCollectionPath() {
             String typeName = dictionary.getJsonAliasFor(type);
             Path path = new Path();
+
+            if (! lineage.isEmpty()) {
+                path.parameters = lineage.stream()
+                        .map((item) -> item.getPathParameter())
+                        .collect(Collectors.toList())
+                        .toArray(new Parameter[0]);
+            }
+
             path.get = new Operation();
+            path.post = new Operation();
 
             if (lineage.isEmpty()) {
                 path.get.description = "Returns the collection of type " + typeName;
@@ -94,12 +116,21 @@ public class SwaggerBuilder {
             }
 
             path.get.responses = new Responses();
+            path.post.responses = new Responses();
 
             path.get.tags = new String[] {getTag()};
+            path.post.tags = new String[] {getTag()};
 
             Response okResponse = new Response();
             okResponse.description = "Successful response";
+            okResponse.schema = new Data(typeName);
             path.get.responses.put(200, okResponse);
+
+            okResponse = new Response();
+            okResponse.description = "Successful response";
+            okResponse.schema = new Datum(typeName);
+            path.post.responses.put(201, okResponse);
+            path.post.parameters = new Parameter[] {getBodyParameter()};
 
             return path;
         }
@@ -107,22 +138,41 @@ public class SwaggerBuilder {
         public Path getInstancePath() {
             String typeName = dictionary.getJsonAliasFor(type);
             Path path = new Path();
+
+            path.parameters = getFullLineage().stream()
+                .map((item) -> item.getPathParameter())
+                .collect(Collectors.toList())
+                .toArray(new Parameter[0]);
+
             path.get = new Operation();
+            path.patch = new Operation();
+            path.delete = new Operation();
+
             path.get.description = "Returns an instance of type " + typeName;
+            path.patch.description = "Modifies an instance of type " + typeName;
+            path.delete.description = "Deletes an instance of type " + typeName;
 
             path.get.responses = new Responses();
+            path.patch.responses = new Responses();
+            path.delete.responses = new Responses();
 
             path.get.tags = new String[] {getTag()};
+            path.patch.tags = new String[] {getTag()};
+            path.delete.tags = new String[] {getTag()};
 
             Response okResponse = new Response();
             okResponse.description = "Successful response";
             okResponse.schema = new Datum(typeName);
             path.get.responses.put(200, okResponse);
 
-            path.parameters = getFullLineage().stream()
-                    .map((item) -> item.getPathParameter())
-                    .collect(Collectors.toList())
-                    .toArray(new Parameter[0]);
+            okResponse = new Response();
+            okResponse.description = "Successful response";
+            path.patch.responses.put(200, okResponse);
+            path.patch.parameters = new Parameter[] {getBodyParameter()};
+
+            okResponse = new Response();
+            okResponse.description = "Successful response";
+            path.delete.responses.put(200, okResponse);
 
             return path;
         }
@@ -130,7 +180,6 @@ public class SwaggerBuilder {
         public Stack<PathMetaData> getFullLineage() {
             Stack<PathMetaData> fullLineage = new Stack<>();
 
-            //TODO - This maybe in the wrong order.
             fullLineage.addAll(lineage);
             fullLineage.add(this);
             return fullLineage;

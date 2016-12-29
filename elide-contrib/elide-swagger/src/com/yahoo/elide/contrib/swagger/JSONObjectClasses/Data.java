@@ -16,6 +16,7 @@ public class Data extends Schema {
 
         Schema resourcesSchema = new Schema();
         resourcesSchema.items = resourceSchema;
+        resourcesSchema.type = Enums.Type.ARRAY;
 
         properties.put("data", resourcesSchema);
     }
