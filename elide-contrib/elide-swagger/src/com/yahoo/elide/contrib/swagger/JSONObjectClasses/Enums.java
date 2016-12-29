@@ -5,145 +5,145 @@
  */
 package com.yahoo.elide.contrib.swagger.JSONObjectClasses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Enums {
     public enum Location {
-        @SerializedName("query")
+        @JsonProperty("query")
         QUERY,
 
-        @SerializedName("header")
+        @JsonProperty("header")
         HEADER,
 
-        @SerializedName("path")
+        @JsonProperty("path")
         PATH,
 
-        @SerializedName("formData")
+        @JsonProperty("formData")
         FORM_DATA, 
 
-        @SerializedName("body")
+        @JsonProperty("body")
         BODY
     };
 
     public enum Format {
-        @SerializedName("csv")
+        @JsonProperty("csv")
         CSV, 
 
-        @SerializedName("SSV")
+        @JsonProperty("SSV")
         SSV,
 
-        @SerializedName("TSV")
+        @JsonProperty("TSV")
         TSV,
 
-        @SerializedName("pipes")
+        @JsonProperty("pipes")
         PIPES,
 
-        @SerializedName("multi")
+        @JsonProperty("multi")
         MULTI
     };
 
     public enum Type {
-        @SerializedName("string")
+        @JsonProperty("string")
         STRING, 
 
-        @SerializedName("number")
+        @JsonProperty("number")
         NUMBER,
 
-        @SerializedName("integer")
+        @JsonProperty("integer")
         INTEGER,
 
-        @SerializedName("boolean")
+        @JsonProperty("boolean")
         BOOLEAN,
 
-        @SerializedName("array")
-        ARRAY, 
+        @JsonProperty("array")
+        ARRAY,
 
-        @SerializedName("file")
+        @JsonProperty("file")
         FILE,
 
-        @SerializedName("null")
+        @JsonProperty("null")
         NULL,
 
-        @SerializedName("object")
+        @JsonProperty("object")
         OBJECT
     };
 
     public enum Scheme {
-        @SerializedName("wss")
+        @JsonProperty("wss")
         WSS, 
 
-        @SerializedName("ws")
+        @JsonProperty("ws")
         WS, 
 
-        @SerializedName("http")
+        @JsonProperty("http")
         HTTP,
 
-        @SerializedName("https")
+        @JsonProperty("https")
         HTTPS
     };
 
     public enum DataType {
-        @SerializedName("integer")
+        @JsonProperty("integer")
         INTEGER,
 
-        @SerializedName("long")
+        @JsonProperty("long")
         LONG,
 
-        @SerializedName("float")
+        @JsonProperty("float")
         FLOAT,
 
-        @SerializedName("double")
+        @JsonProperty("double")
         DOUBLE,
 
-        @SerializedName("string")
+        @JsonProperty("string")
         STRING,
 
-        @SerializedName("byte")
+        @JsonProperty("byte")
         BYTE,
 
-        @SerializedName("binary")
+        @JsonProperty("binary")
         BINARY,
 
-        @SerializedName("boolean")
+        @JsonProperty("boolean")
         BOOLEAN,
 
-        @SerializedName("date")
+        @JsonProperty("date")
         DATE,
 
-        @SerializedName("dateTime")
+        @JsonProperty("dateTime")
         DATETIME,
 
-        @SerializedName("password")
+        @JsonProperty("password")
         PASSWORD
     };
 
     public enum SecurityType {
-        @SerializedName("basic")
+        @JsonProperty("basic")
         BASIC, 
 
-        @SerializedName("apiKey")
+        @JsonProperty("apiKey")
         APIKEY, 
 
-        @SerializedName("oauth2")
+        @JsonProperty("oauth2")
         OAUTH2
     };
 
     public enum ApiKeyLocation {
-        @SerializedName("query")
+        @JsonProperty("query")
         QUERY, 
 
-        @SerializedName("header")
+        @JsonProperty("header")
         HEADER
     };
 
     public enum Flow {
-        @SerializedName("implicit")
+        @JsonProperty("implicit")
         IMPLICIT,
-        @SerializedName("password")
+        @JsonProperty("password")
         PASSWORD,
-        @SerializedName("application")
+        @JsonProperty("application")
         APPLICATION,
-        @SerializedName("accessCode")
+        @JsonProperty("accessCode")
         ACCESSCODE
     }
 }

@@ -1,5 +1,7 @@
 package com.yahoo.elide.contrib.swagger;
 
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Datum;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Definitions;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
@@ -97,6 +99,7 @@ public class SwaggerBuilder {
 
             Response okResponse = new Response();
             okResponse.description = "Successful response";
+            okResponse.schema = new Datum(typeName);
             path.get.responses.put(200, okResponse);
 
             return path;
@@ -126,7 +129,20 @@ public class SwaggerBuilder {
 
     public SwaggerBuilder(EntityDictionary dictionary, Info info) {
         this.dictionary = dictionary;
+        TypeCoercion coercion = new TypeCoercion(dictionary);
+
+        swagger = new Swagger();
+        swagger.definitions = new Definitions();
+
         Set<Class<?>> allClasses = dictionary.getBindings();
+
+        for (Class<?> clazz : allClasses) {
+            swagger.definitions.put(
+                    dictionary.getJsonAliasFor(clazz),
+                    coercion.coerce(clazz)
+            );
+        }
+
         rootClasses =  allClasses.stream()
                 .filter(dictionary::isRoot)
                 .collect(Collectors.toSet());
@@ -136,7 +152,6 @@ public class SwaggerBuilder {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
-        swagger = new Swagger();
         Paths paths = new Paths();
 
         for (PathMetaData pathDatum : pathData) {

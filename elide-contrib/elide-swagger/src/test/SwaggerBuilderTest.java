@@ -89,6 +89,7 @@ public class SwaggerBuilderTest {
         Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}/authors/{authorId}"));
         Assert.assertEquals(swagger.paths.size(), 8);
 
-        System.out.println(swagger.toString());
+        System.err.println(swagger.toString());
+        System.err.flush();
     }
 }

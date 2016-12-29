@@ -5,14 +5,14 @@
  */
 package com.yahoo.elide.contrib.swagger.JSONObjectClasses;
 
-public class JsonApiSchema extends Schema {
+public class Resource extends Schema {
 
     public static final Schema STRING_SCHEMA = new Schema();
     static {
         STRING_SCHEMA.type = Enums.Type.STRING;
     }
 
-    public JsonApiSchema() {
+    public Resource() {
         type = Enums.Type.OBJECT;
         properties = new Properties();
         properties.put("type", STRING_SCHEMA);

@@ -7,7 +7,7 @@ package com.yahoo.elide.contrib.swagger;
 
 
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.JsonApiSchema;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Resource;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Properties;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
 import com.yahoo.elide.core.EntityDictionary;
@@ -84,7 +84,7 @@ public class TypeCoercion {
     public Schema coerceEntity(Class<?> sourceType) {
         String typeAlias = dictionary.getJsonAliasFor(sourceType);
 
-        JsonApiSchema entitySchema = new JsonApiSchema();
+        Resource entitySchema = new Resource();
 
         List<String> attributeNames = dictionary.getAttributes(sourceType);
         for (String attributeName : attributeNames) {
