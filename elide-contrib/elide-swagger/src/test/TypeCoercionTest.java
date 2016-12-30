@@ -6,64 +6,18 @@
 package test;
 
 import com.google.common.collect.Maps;
-import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.contrib.swagger.TypeCoercion;
 import com.yahoo.elide.contrib.swagger.model.Enums;
 import com.yahoo.elide.contrib.swagger.model.Schema;
-import com.yahoo.elide.contrib.swagger.TypeCoercion;
 import com.yahoo.elide.core.EntityDictionary;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import java.util.Set;
+import test.models.Author;
+import test.models.AuthorType;
+import test.models.Book;
+import test.models.Publisher;
 
 public class TypeCoercionTest {
-    @Entity
-    @Include
-    public class Author {
-        @OneToMany
-        public Set<Book> getBooks() {
-            return null;
-        }
-
-        @OneToMany
-        public Set<Publisher> getPublisher() {
-            return null;
-        }
-    }
-
-    @Entity
-    @Include(rootLevel = true)
-    public class Publisher {
-
-        @OneToMany
-        public Set<Book> getBooks() {
-            return null;
-        }
-
-        @OneToMany
-        public Set<Author> getExclusiveAuthors() {
-            return null;
-        }
-    }
-
-    @Entity
-    @Include(rootLevel = true)
-    public class Book {
-        @OneToMany
-        public Set<Author> getAuthors() {
-            return null;
-        }
-
-        @OneToOne
-        public Publisher getPublisher() {
-            return null;
-        }
-
-        public String title;
-    }
 
     @Test
     public void testEntityCoercion() {
@@ -105,5 +59,15 @@ public class TypeCoercionTest {
 
         Assert.assertEquals(schema.type, Enums.Type.ARRAY);
         Assert.assertEquals(schema.items.type, Enums.Type.STRING);
+    }
+
+    @Test
+    public void testEnumCoercion() {
+        EntityDictionary dictionary = new EntityDictionary(Maps.newHashMap());
+        TypeCoercion coercion = new TypeCoercion(dictionary);
+
+        Schema schema = coercion.coerce(AuthorType.class);
+
+        Assert.assertEquals(schema.enumeration.length, 3);
     }
 }

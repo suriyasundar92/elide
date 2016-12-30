@@ -33,6 +33,8 @@ public class Schema extends SwaggerComponent {
     public Integer minProperties;
     // I guess this is everything this is allowed to be? 
     // I dunno. May the gods help you in filling this one out.
+
+    @JsonProperty("enum")
     public Object[] enumeration;
     public Integer multipleOf;
     public Enums.Type type;

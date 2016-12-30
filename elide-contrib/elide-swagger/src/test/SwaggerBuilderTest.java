@@ -6,64 +6,17 @@
 package test;
 
 import com.google.common.collect.Maps;
-import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.contrib.swagger.SwaggerBuilder;
 import com.yahoo.elide.contrib.swagger.model.Info;
 import com.yahoo.elide.contrib.swagger.model.Swagger;
-import com.yahoo.elide.contrib.swagger.SwaggerBuilder;
 import com.yahoo.elide.core.EntityDictionary;
 import junit.framework.Assert;
 import org.testng.annotations.Test;
-
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import java.util.Set;
+import test.models.Author;
+import test.models.Book;
+import test.models.Publisher;
 
 public class SwaggerBuilderTest {
-    @Entity
-    @Include
-    public class Author {
-        @OneToMany
-        public Set<Book> getBooks() {
-            return null;
-        }
-
-        @OneToMany
-        public Set<Publisher> getPublisher() {
-            return null;
-        }
-    }
-
-    @Entity
-    @Include(rootLevel = true)
-    public class Publisher {
-
-        @OneToMany
-        public Set<Book> getBooks() {
-            return null;
-        }
-
-        @OneToMany
-        public Set<Author> getExclusiveAuthors() {
-            return null;
-        }
-    }
-
-    @Entity
-    @Include(rootLevel = true)
-    public class Book {
-        @OneToMany
-        public Set<Author> getAuthors() {
-            return null;
-        }
-
-        @OneToOne
-        public Publisher getPublisher() {
-            return null;
-        }
-    }
-
-
     @Test
     public void testPathGeneration() throws Exception {
         EntityDictionary dictionary = new EntityDictionary(Maps.newHashMap());

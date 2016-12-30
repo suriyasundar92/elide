@@ -7,9 +7,9 @@ package com.yahoo.elide.contrib.swagger;
 
 
 import com.yahoo.elide.contrib.swagger.model.Enums;
-import com.yahoo.elide.contrib.swagger.model.jsonapi.Resource;
 import com.yahoo.elide.contrib.swagger.model.Properties;
 import com.yahoo.elide.contrib.swagger.model.Schema;
+import com.yahoo.elide.contrib.swagger.model.jsonapi.Resource;
 import com.yahoo.elide.core.EntityDictionary;
 
 import java.lang.reflect.ParameterizedType;
@@ -59,6 +59,21 @@ public class TypeCoercion {
             arraySchema.items = coerce(componentClazz);
 
             return arraySchema;
+        }
+
+        if (sourceType.isEnum()) {
+            Schema enumSchema = new Schema();
+
+            Enum[] values = (Enum[])sourceType.getEnumConstants();
+            String[] names = new String[values.length];
+
+            for (int idx = 0; idx < values.length; idx++) {
+                names[idx] = values[idx].name();
+            }
+
+            enumSchema.enumeration = names;
+
+            return enumSchema;
         }
 
         if (Collection.class.isAssignableFrom(sourceType) &&
