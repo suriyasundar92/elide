@@ -9,12 +9,14 @@ import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Parameter;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
+import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Relationship;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Response;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
 import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Tag;
 import com.yahoo.elide.core.EntityDictionary;
+import com.yahoo.elide.core.RelationshipType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -61,6 +63,17 @@ public class SwaggerBuilder {
             return getCollectionUrl() + "/{" + typeName + "Id}";
         }
 
+        public String getRelationshipUrl() {
+            if (lineage.isEmpty()) {
+                throw new IllegalStateException("Root collections don't have relationships");
+            }
+
+            PathMetaData prior = lineage.peek();
+            String baseUrl = prior.getInstanceUrl();
+
+            return baseUrl + "/relationships/" + name;
+        }
+
         private String getTag() {
             if (lineage.isEmpty()) {
                 return name;
@@ -74,25 +87,80 @@ public class SwaggerBuilder {
 
             Parameter param = new Parameter();
             param.in =  Enums.Location.PATH;
-            param.schema = new Schema();
-            param.schema.type = Enums.Type.STRING;
-            param.required = true;
+            param.schema = new Schema(Enums.Type.STRING);
             param.name = typeName + "Id";
             param.description = typeName + " ID";
 
             return param;
         }
 
-        private Parameter getBodyParameter() {
-            String typeName = dictionary.getJsonAliasFor(type);
-
+        private Parameter getBodyParameter(String typeName, boolean isPlural) {
             Parameter param = new Parameter();
             param.in =  Enums.Location.BODY;
-            param.schema = new Datum(typeName);
+
+            if (isPlural) {
+                param.schema = new Datum(typeName);
+            } else {
+                param.schema = new Data(typeName);
+            }
+
             param.required = true;
             param.name = typeName;
 
             return param;
+        }
+        
+        public Path getRelationshipPath() {
+            if (lineage.isEmpty()) {
+                throw new IllegalStateException("Root collections don't have relationships");
+            }
+
+            String typeName = dictionary.getJsonAliasFor(type);
+            Path path = new Path();
+            path.parameters = lineage.stream()
+                .map((item) -> item.getPathParameter())
+                .collect(Collectors.toList())
+                .toArray(new Parameter[0]);
+
+            path.get = new Operation();
+            path.patch = new Operation();
+
+            path.get.description = "Returns the relationship identifiers for " + name;
+            path.patch.description = "Replaces the relationship identifiers for " + name;
+
+            path.get.tags = new String[] {getTag()};
+            path.patch.tags = new String[] {getTag()};
+
+            RelationshipType relationshipType = dictionary.getRelationshipType(type, name);
+
+            /* Only to many relationships support POST & DELETE */
+            if (relationshipType.isToMany()) {
+                path.post = new Operation();
+                path.delete = new Operation();
+
+                path.post.description = "Appends to the relationship identifiers for " + name;
+                path.delete.description = "Deletes the relationship identifiers for " + name;
+
+                path.post.tags = new String[] {getTag()};
+                path.delete.tags = new String[] {getTag()};
+
+                path.get.responses.put(200, new Response(new Datum("relationship"), "Successful response"));
+                path.post.responses.put(201, new Response(new Data("relationship"), "Successful response"));
+                path.delete.responses.put(200, new Response("Successful response"));
+                path.patch.responses.put(200, new Response("Successful response"));
+
+                path.post.parameters = new Parameter[] {getBodyParameter("relationship", true)};
+                path.delete.parameters = new Parameter[] {getBodyParameter("relationship", true)};
+                path.patch.parameters = new Parameter[] {getBodyParameter("relationship", true)};
+
+            } else {
+                path.get.responses.put(200, new Response(new Data("relationship"), "Successful response"));
+                path.patch.responses.put(200, new Response("Successful response"));
+
+                path.patch.parameters = new Parameter[] {getBodyParameter("relationship", false)};
+            }
+
+            return path;
         }
 
         public Path getCollectionPath() {
@@ -130,7 +198,7 @@ public class SwaggerBuilder {
             okResponse.description = "Successful response";
             okResponse.schema = new Datum(typeName);
             path.post.responses.put(201, okResponse);
-            path.post.parameters = new Parameter[] {getBodyParameter()};
+            path.post.parameters = new Parameter[] {getBodyParameter(typeName, true)};
 
             return path;
         }
@@ -168,7 +236,7 @@ public class SwaggerBuilder {
             okResponse = new Response();
             okResponse.description = "Successful response";
             path.patch.responses.put(200, okResponse);
-            path.patch.parameters = new Parameter[] {getBodyParameter()};
+            path.patch.parameters = new Parameter[] {getBodyParameter(typeName, true)};
 
             okResponse = new Response();
             okResponse.description = "Successful response";
@@ -213,6 +281,7 @@ public class SwaggerBuilder {
                     coercion.coerce(clazz)
             );
         }
+        swagger.definitions.put("relationship", new Relationship());
 
         rootClasses =  allClasses.stream()
                 .filter(dictionary::isRoot)
@@ -228,6 +297,10 @@ public class SwaggerBuilder {
         for (PathMetaData pathDatum : pathData) {
             paths.put(pathDatum.getCollectionUrl(), pathDatum.getCollectionPath());
             paths.put(pathDatum.getInstanceUrl(), pathDatum.getInstancePath());
+
+            if (! pathDatum.lineage.isEmpty()) {
+                paths.put(pathDatum.getRelationshipUrl(), pathDatum.getRelationshipPath());
+            }
         }
 
         swagger.info = info;
@@ -273,67 +346,4 @@ public class SwaggerBuilder {
         }
         return paths;
     }
-
-    // public SwaggerBuilder(EntityDictionary entityDictionary)
-    // {
-    //     Swagger retval = new Swagger();
-    //     // Most of the stuff in this object is for humans to read, which will make 
-    //     // it really hard to automatically generate. We might need some annotations
-    //     // to make this work.
-    //     Info info = new Info();
-    //     retval.info = info;
-
-    //     // Since the server implementation is separate from Elide (I think), we can't know
-    //     // this. Knowing this means that the user would have to write it twice, once, for 
-    //     // the server and once for us, but I don't know how to get around that.
-    //     // TODO: Find a better way to know this.
-    //     Enums.Scheme[] schemes = new Enum.Scheme[] {Enum.Scheme.HTTP};
-    //     retval.schemes = schemes;
-
-    //     // If I understand correctly, swagger is set up so that it can only accept and 
-    //     // return json text, so I think we can hardcode this. Maybe?
-    //     retval.consumes = new MimeType[] {new MimeType("application/json")};
-    //     retval.produces = new MimeType[] {new MimeType("application/json")};
-
-    //     // This is going to be the fun part. I think most of the work will be filling this out
-    //     Paths paths = new Paths();
-    //     retval.paths = paths;
-    //     // I'm pretty sure, if I understand correctly, that this should be a hashmap 
-    //     // of all the data model classes we have and all the things in them. I wonder 
-    //     // if it can be recursive...
-    //     // Anyway, I don't think this will actually be that hard. We'll learn about
-    //     // reflection. 
-    //     Definitions definitions = new Definitions();
-    //     retval.definitions = definitions;
-
-    //     // I still don't wholly understand this. I think it is for the benefit of a
-    //     // human writing this, which doesn't matter to us. We might well leave it blank.
-    //     ParametersDefinitions parameters = new ParametersDefinitions();
-    //     retval.parameters = paramters;
-
-    //     // I think this is just like a ParametersDefinitions in that it's for the benefit of a
-    //     // human so we probably won't use it.
-    //     ResponsesDefinitions responses = new ResponsesDefinitions();
-    //     retval.responses = responses;
-
-    //     // I really hope that the EntityDictionary knows all the right things to make this
-    //     // becuause otherwise this could be quite complicated to fill out.
-    //     SecurityDefinitions securityDefinitions = new SecurityDefinitions();
-    //     retval.securityDefinitions = securityDefinitions;
-
-    //     // Implementing this could also be complicated unless the EntityDictionary
-    //     // knows exactly what this needs to have.
-    //     SecurityRequirement[] security;
-    //     retval.security = security;
-
-    //     // I don't know what this does, but I think the odds are more than even that 
-    //     // it doesn't get used by us.
-    //     Tag[] tags;
-    //     retval.tags = tags;
-
-    //     // This should at least be simple. We'll need to have another annotation,
-    //     // put the URL from there into here, and we're done. 
-    //     ExternalDocumentation externalDocs;
-    //     retval.externalDocs = externalDocs;
-    // }
 }

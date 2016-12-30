@@ -83,11 +83,13 @@ public class SwaggerBuilderTest {
         Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}"));
         Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}/exclusiveAuthors"));
         Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}/exclusiveAuthors/{authorId}"));
+        Assert.assertTrue(swagger.paths.containsKey("/publisher/{publisherId}/relationships/exclusiveAuthors"));
         Assert.assertTrue(swagger.paths.containsKey("/book"));
         Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}"));
         Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}/authors"));
         Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}/authors/{authorId}"));
-        Assert.assertEquals(swagger.paths.size(), 8);
+        Assert.assertTrue(swagger.paths.containsKey("/book/{bookId}/relationships/authors"));
+        Assert.assertEquals(swagger.paths.size(), 10);
 
         System.err.println(swagger.toString());
         System.err.flush();

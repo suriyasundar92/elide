@@ -38,10 +38,26 @@ public class Schema extends SwaggerComponent {
     public Enums.Type type;
     public Properties properties;
     public Schema items;
+    public Schema[] oneOf;
     public Schema()
     {
         required = REQUIRED;
     }
+
+    public Schema(Enums.Type type) {
+        required = REQUIRED;
+        this.type = type;
+
+        if (type == Enums.Type.OBJECT) {
+            this.properties = new Properties();
+        }
+    }
+
+    public Schema(String reference) {
+        required = REQUIRED;
+        this.ref = reference;
+    }
+
     @Override
     public void checkRequired() throws SwaggerValidationException
     {

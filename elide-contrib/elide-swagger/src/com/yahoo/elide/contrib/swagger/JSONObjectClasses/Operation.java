@@ -6,8 +6,6 @@
 package com.yahoo.elide.contrib.swagger.JSONObjectClasses;
 
 import java.util.HashSet;
-import java.lang.IllegalArgumentException;
-import java.util.Arrays;
 
 public class Operation extends SwaggerComponent {
     private static HashSet<String> usedOperationIds = new HashSet<>();
@@ -29,7 +27,9 @@ public class Operation extends SwaggerComponent {
     public Operation()
     {
         required = REQUIRED;
+        responses = new Responses();
     }
+
     @Override
     public void checkRequired() throws SwaggerValidationException
     {
