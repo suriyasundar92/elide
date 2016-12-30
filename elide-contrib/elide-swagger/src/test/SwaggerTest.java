@@ -1,21 +1,20 @@
 package test;
 
 
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Contact;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Header;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Items;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.MimeType;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Parameter;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.SecurityRequirement;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.SwaggerValidationException;
+import com.yahoo.elide.contrib.swagger.model.Contact;
+import com.yahoo.elide.contrib.swagger.model.Enums;
+import com.yahoo.elide.contrib.swagger.model.Header;
+import com.yahoo.elide.contrib.swagger.model.Info;
+import com.yahoo.elide.contrib.swagger.model.Items;
+import com.yahoo.elide.contrib.swagger.model.Operation;
+import com.yahoo.elide.contrib.swagger.model.Parameter;
+import com.yahoo.elide.contrib.swagger.model.Path;
+import com.yahoo.elide.contrib.swagger.model.Paths;
+import com.yahoo.elide.contrib.swagger.model.Responses;
+import com.yahoo.elide.contrib.swagger.model.Schema;
+import com.yahoo.elide.contrib.swagger.model.SecurityRequirement;
+import com.yahoo.elide.contrib.swagger.model.Swagger;
+import com.yahoo.elide.contrib.swagger.model.SwaggerValidationException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -327,7 +326,7 @@ public class SwaggerTest {
         }
         catch (SwaggerValidationException e)
         {}
-        operation.consumes = new MimeType[] {new MimeType("multipart/form-data")};
+        operation.consumes = new String[] {new String("multipart/form-data")};
         operation.checkRequired();
     }
 

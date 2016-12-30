@@ -7,8 +7,8 @@ package test;
 
 import com.google.common.collect.Maps;
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
+import com.yahoo.elide.contrib.swagger.model.Enums;
+import com.yahoo.elide.contrib.swagger.model.Schema;
 import com.yahoo.elide.contrib.swagger.TypeCoercion;
 import com.yahoo.elide.core.EntityDictionary;
 import org.testng.Assert;

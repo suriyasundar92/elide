@@ -6,10 +6,10 @@
 package com.yahoo.elide.contrib.swagger;
 
 
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Resource;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Properties;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
+import com.yahoo.elide.contrib.swagger.model.Enums;
+import com.yahoo.elide.contrib.swagger.model.jsonapi.Resource;
+import com.yahoo.elide.contrib.swagger.model.Properties;
+import com.yahoo.elide.contrib.swagger.model.Schema;
 import com.yahoo.elide.core.EntityDictionary;
 
 import java.lang.reflect.ParameterizedType;

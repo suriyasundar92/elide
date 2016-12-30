@@ -7,8 +7,8 @@ package test;
 
 import com.google.common.collect.Maps;
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
+import com.yahoo.elide.contrib.swagger.model.Info;
+import com.yahoo.elide.contrib.swagger.model.Swagger;
 import com.yahoo.elide.contrib.swagger.SwaggerBuilder;
 import com.yahoo.elide.core.EntityDictionary;
 import junit.framework.Assert;

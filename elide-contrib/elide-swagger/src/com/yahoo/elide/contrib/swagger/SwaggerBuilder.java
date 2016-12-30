@@ -1,20 +1,20 @@
 package com.yahoo.elide.contrib.swagger;
 
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Data;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Datum;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Definitions;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Enums;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Info;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Operation;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Parameter;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Path;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Paths;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Relationship;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Response;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Responses;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Schema;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Swagger;
-import com.yahoo.elide.contrib.swagger.JSONObjectClasses.Tag;
+import com.yahoo.elide.contrib.swagger.model.Definitions;
+import com.yahoo.elide.contrib.swagger.model.Enums;
+import com.yahoo.elide.contrib.swagger.model.Info;
+import com.yahoo.elide.contrib.swagger.model.Operation;
+import com.yahoo.elide.contrib.swagger.model.Parameter;
+import com.yahoo.elide.contrib.swagger.model.Path;
+import com.yahoo.elide.contrib.swagger.model.Paths;
+import com.yahoo.elide.contrib.swagger.model.Response;
+import com.yahoo.elide.contrib.swagger.model.Responses;
+import com.yahoo.elide.contrib.swagger.model.Schema;
+import com.yahoo.elide.contrib.swagger.model.Swagger;
+import com.yahoo.elide.contrib.swagger.model.Tag;
+import com.yahoo.elide.contrib.swagger.model.jsonapi.Data;
+import com.yahoo.elide.contrib.swagger.model.jsonapi.Datum;
+import com.yahoo.elide.contrib.swagger.model.jsonapi.Relationship;
 import com.yahoo.elide.core.EntityDictionary;
 import com.yahoo.elide.core.RelationshipType;
 import lombok.AllArgsConstructor;
@@ -33,6 +33,8 @@ public class SwaggerBuilder {
     EntityDictionary dictionary;
     Set<Class<?>> rootClasses;
     Swagger swagger;
+
+    public static final String JSON_API_MIME = "application/vnd.api+json";
 
     @AllArgsConstructor
     public class PathMetaData {
@@ -131,6 +133,10 @@ public class SwaggerBuilder {
             path.get.tags = new String[] {getTag()};
             path.patch.tags = new String[] {getTag()};
 
+            path.get.produces = new String[] { JSON_API_MIME };
+            path.patch.produces = new String[] { JSON_API_MIME };
+            path.patch.consumes = new String[] { JSON_API_MIME };
+
             RelationshipType relationshipType = dictionary.getRelationshipType(type, name);
 
             /* Only to many relationships support POST & DELETE */
@@ -143,6 +149,10 @@ public class SwaggerBuilder {
 
                 path.post.tags = new String[] {getTag()};
                 path.delete.tags = new String[] {getTag()};
+
+                path.delete.produces = new String[] { JSON_API_MIME };
+                path.post.produces = new String[] { JSON_API_MIME };
+                path.post.consumes = new String[] { JSON_API_MIME };
 
                 path.get.responses.put(200, new Response(new Datum("relationship"), "Successful response"));
                 path.post.responses.put(201, new Response(new Data("relationship"), "Successful response"));
@@ -189,6 +199,10 @@ public class SwaggerBuilder {
             path.get.tags = new String[] {getTag()};
             path.post.tags = new String[] {getTag()};
 
+            path.get.produces = new String[] { JSON_API_MIME };
+            path.post.produces = new String[] { JSON_API_MIME };
+            path.post.consumes = new String[] { JSON_API_MIME };
+
             Response okResponse = new Response();
             okResponse.description = "Successful response";
             okResponse.schema = new Data(typeName);
@@ -227,6 +241,11 @@ public class SwaggerBuilder {
             path.get.tags = new String[] {getTag()};
             path.patch.tags = new String[] {getTag()};
             path.delete.tags = new String[] {getTag()};
+
+            path.get.produces = new String[] { JSON_API_MIME };
+            path.patch.produces = new String[] { JSON_API_MIME };
+            path.patch.consumes = new String[] { JSON_API_MIME };
+            path.delete.produces = new String[] { JSON_API_MIME };
 
             Response okResponse = new Response();
             okResponse.description = "Successful response";
@@ -318,7 +337,7 @@ public class SwaggerBuilder {
         return swagger;
     }
 
-    public Set<PathMetaData> find(Class<?> rootClass) {
+    protected Set<PathMetaData> find(Class<?> rootClass) {
         Queue<PathMetaData> toVisit = new ArrayDeque<>();
         Set<PathMetaData> paths = new HashSet<>();
 
