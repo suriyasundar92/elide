@@ -6,9 +6,7 @@
 
 package com.yahoo.elide.graphql;
 
-import com.yahoo.elide.core.EntityDictionary;
 import example.Author;
-import example.Book;
 import graphql.Scalars;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLEnumType;
@@ -17,26 +15,14 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import org.testng.Assert;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
 
-public class ModelBuilderTest {
-    EntityDictionary dictionary;
-
-    @BeforeSuite
-    public void init() {
-        dictionary = new EntityDictionary(Collections.EMPTY_MAP);
-
-        dictionary.bindEntity(Book.class);
-        dictionary.bindEntity(Author.class);
-    }
-
+public class ModelBuilderTest extends AbstractGraphQLTest {
 
     @Test
     public void testBuild() {
