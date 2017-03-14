@@ -7,23 +7,20 @@ package example;
 
 import com.yahoo.elide.annotation.Audit;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.OnCreatePostCommit;
 import com.yahoo.elide.annotation.OnCreatePreCommit;
 import com.yahoo.elide.annotation.OnCreatePreSecurity;
-import com.yahoo.elide.annotation.OnCreatePostCommit;
+import com.yahoo.elide.annotation.OnDeletePostCommit;
+import com.yahoo.elide.annotation.OnDeletePreCommit;
 import com.yahoo.elide.annotation.OnDeletePreSecurity;
 import com.yahoo.elide.annotation.OnReadPostCommit;
 import com.yahoo.elide.annotation.OnReadPreCommit;
 import com.yahoo.elide.annotation.OnReadPreSecurity;
-import com.yahoo.elide.annotation.OnUpdatePreSecurity;
-import com.yahoo.elide.annotation.OnDeletePostCommit;
 import com.yahoo.elide.annotation.OnUpdatePostCommit;
-import com.yahoo.elide.annotation.OnDeletePreCommit;
 import com.yahoo.elide.annotation.OnUpdatePreCommit;
+import com.yahoo.elide.annotation.OnUpdatePreSecurity;
 import com.yahoo.elide.annotation.SharePermission;
 import com.yahoo.elide.security.RequestScope;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,6 +28,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Model for books.
@@ -160,5 +159,10 @@ public class Book {
     @OnReadPostCommit
     public void postRead(RequestScope requestScope) {
         // book being read post commit
+    }
+
+    @Override
+    public String toString() {
+        return "Book{id=" + id + ", title='" + title + "\'}";
     }
 }
