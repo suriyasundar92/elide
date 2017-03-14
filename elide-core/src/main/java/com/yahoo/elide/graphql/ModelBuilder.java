@@ -42,18 +42,22 @@ public class ModelBuilder {
     private GraphQLArgument relationshipOpArg;
     private GraphQLArgument idArgument;
 
+    public static final String OPERATION_ARGUMENT = "op";
+    public static final String RELATIONSHIP_ARGUMENT = "relationship";
+    public static final String ID_ARGUMENT = "id";
+
     ModelBuilder(EntityDictionary dictionary, DataFetcher dataFetcher) {
         this.dictionary = dictionary;
         this.dataFetcher = dataFetcher;
 
         relationshipOpArg = GraphQLArgument.newArgument()
-                .name("op")
+                .name(OPERATION_ARGUMENT)
                 .type(toGraphQLType(RelationshipOp.class))
                 .defaultValue(RelationshipOp.FETCH)
                 .build();
 
         idArgument = GraphQLArgument.newArgument()
-                .name("id")
+                .name(ID_ARGUMENT)
                 .type(Scalars.GraphQLString)
                 .build();
     }
@@ -179,12 +183,12 @@ public class ModelBuilder {
 
         if (asList) {
              return GraphQLArgument.newArgument()
-                    .name("relationship")
+                    .name(RELATIONSHIP_ARGUMENT)
                     .type(new GraphQLList(argumentType))
                     .build();
         } else {
             return GraphQLArgument.newArgument()
-                    .name("relationship")
+                    .name(RELATIONSHIP_ARGUMENT)
                     .type(argumentType)
                     .build();
         }
