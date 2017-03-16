@@ -10,6 +10,7 @@ import example.Author;
 import graphql.Scalars;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLEnumValueDefinition;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
@@ -82,7 +83,7 @@ public class ModelBuilderTest extends AbstractGraphQLTest {
     private boolean validateEnum(Class<?> expected, GraphQLEnumType actual) {
         Enum [] values = (Enum []) expected.getEnumConstants();
         Set<String> enumNames = actual.getValues().stream()
-                .map((value) -> value.getName())
+                .map(GraphQLEnumValueDefinition::getName)
                 .collect(Collectors.toSet());
 
         for (Enum value : values) {
