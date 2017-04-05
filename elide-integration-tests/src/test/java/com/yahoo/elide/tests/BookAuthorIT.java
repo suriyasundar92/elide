@@ -237,4 +237,9 @@ public class BookAuthorIT extends AbstractIntegrationTestInitializer {
             Assert.assertFalse(include.has(RELATIONSHIPS));
         }
     }
+
+    @Test
+    public void testFilterWithSpecialCharacter() throws Exception {
+
+    }
 }
