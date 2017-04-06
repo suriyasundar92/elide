@@ -5,5 +5,5 @@ steps:
     options: "-Dmaven.test.skip=true"
 
 jobs:
-  pull_request:
+  pull-request:
     order: [init, assemble, flatten, restore, maven-build , package, stop]
