@@ -5,5 +5,5 @@ jobs:
     steps:
       maven-install:
         description: "simple build step"
-        command: mvn install
+        command: mvn compile
     order: [init, assemble, flatten, restore, maven-install, stop]
