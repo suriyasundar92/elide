@@ -4,5 +4,6 @@ jobs:
   pull_request:
     steps:
       maven-install:
+        description: "simple build step"
         command: mvn install
     order: [init, assemble, flatten, restore, maven-install, stop]
