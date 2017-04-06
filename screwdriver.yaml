@@ -2,4 +2,4 @@ platform: java
 
 jobs:
   pull_request:
-    order: [init, assemble, flatten, restore, maven-build, package, stop]
+    order: [init, assemble, flatten, restore, maven-build -Dmaven.test.skip=true, package, stop]
